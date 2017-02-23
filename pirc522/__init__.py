@@ -52,7 +52,8 @@ class RFID(object):
         self.spi.open(bus, device)
         self.spi.max_speed_hz = speed
 
-        GPIO.setmode(GPIO.BOARD)
+        # GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin_rst, GPIO.OUT)
         GPIO.setup(pin_irq, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.add_event_detect(pin_irq, GPIO.FALLING,

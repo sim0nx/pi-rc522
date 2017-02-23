@@ -8,9 +8,7 @@ __version__ = "2.0.0"
 
 
 class RFID(object):
-    pin_rst = 25
     pin_ce = 0
-    pin_irq = 24
 
     mode_idle = 0x00
     mode_auth = 0x0E
@@ -42,8 +40,8 @@ class RFID(object):
     authed = False
     irq = threading.Event()
 
-    def __init__(self, bus=0, device=0, speed=1000000, pin_rst=25,
-            pin_ce=0, pin_irq=24):
+    def __init__(self, bus=0, device=0, speed=1000000, pin_rst=None,
+            pin_ce=0, pin_irq=None, gpio_mode=GPIO.BOARD):
         self.pin_rst = pin_rst
         self.pin_ce = pin_ce
         self.pin_irq = pin_irq
@@ -52,8 +50,20 @@ class RFID(object):
         self.spi.open(bus, device)
         self.spi.max_speed_hz = speed
 
-        # GPIO.setmode(GPIO.BOARD)
-        GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(gpio_mode)
+
+        if pin_rst is None:
+            if gpio_mode == GPIO.BOARD:
+                pin_rst = 22
+            else:
+                pin_rst = 25
+
+        if pin_irq is None:
+            if gpio_mode == GPIO.BOARD:
+                pin_irq = 18
+            else:
+                pin_irq = 24
+
         GPIO.setup(pin_rst, GPIO.OUT)
         GPIO.setup(pin_irq, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.add_event_detect(pin_irq, GPIO.FALLING,
